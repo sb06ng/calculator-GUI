@@ -1,17 +1,21 @@
 import tkinter as tk
 
-CALCULATOR_WIDTH = 400
+FONT = "Arial"
+BACKGROUND_COLOR = "white"
+CALCULATOR_COLOR = "blue"
+BUTTON_COLOR = "YELLOW"
+CALCULATOR_WIDTH = 700
 CALCULATOR_HEIGHT = 700
 EQUATION_FONT_SIZE = int(CALCULATOR_HEIGHT / 10)
 PADDING = 2
 BUTTONS_LAYOUT = [
-            '(',')','tan(','sin(',
-            '7', '8', '9', '/',
-            '4', '5', '6', '*',
-            '1', '2', '3', '-',
-            'C', '0', '=', '+'
+    'x²', '<-', '(', ' )', '/',
+    'tan', '7', '8', '9', '*',
+    'sin', '4', '5', '6', '-',
+    '!',    '1', '2', '3', '+',
+    '√',    '.', '0', 'C', '=',
         ]
-COLUMNS_NUMBER = 4
+COLUMNS_NUMBER = 5
 ROWS_NUMBER = len(BUTTONS_LAYOUT) // COLUMNS_NUMBER
 
 
@@ -20,7 +24,7 @@ class Calculator:
         self.root = master
         self.root.title("Calculator-GUI")
         self.root.geometry(f"{CALCULATOR_WIDTH}x{CALCULATOR_HEIGHT}")
-        self.root.configure(background="gray")
+        self.root.configure(background=BACKGROUND_COLOR)
         self.root.resizable(False, False)
 
         # create the area where the equation exist
@@ -28,7 +32,7 @@ class Calculator:
         self.entry = tk.Entry(
             master,
             width=CALCULATOR_WIDTH,
-            font=('Arial', EQUATION_FONT_SIZE),
+            font=(FONT, EQUATION_FONT_SIZE),
             textvariable=self.equation
         )
         self.entry.pack(side="top", fill="x")
@@ -41,7 +45,7 @@ class Calculator:
             master,
             width=CALCULATOR_WIDTH,
             height=canvas_h,
-            background="pink",
+            background=CALCULATOR_COLOR,
             highlightthickness=0,
             borderwidth=0
         )
@@ -64,8 +68,8 @@ class Calculator:
             btn = tk.Button(
                 self.button_canvas,
                 text=label,
-                bg="white",
-                font=("Ariel", 14, "bold"),
+                bg=BUTTON_COLOR,
+                font=(FONT, 14),
                 command=lambda l=label: self.on_button_click(l)
             )
 
@@ -78,10 +82,19 @@ class Calculator:
                 height=btn_h - (PADDING * 2)
             )
 
+    def calculate(self, equation):
+        self.equation.set("")
+        pass
 
     def on_button_click(self, value):
         if value == "C":
             self.equation.set("")
+        elif value == "=":
+            self.calculate(self.equation.get())
+        elif value == "<-":
+            self.equation.set(self.equation.get()[:-1])
+        elif value == "x²":
+            self.equation.set(self.equation.get() + "²")
         else:
             self.equation.set(self.equation.get() + value)
 
