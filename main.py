@@ -1,5 +1,7 @@
 import tkinter as tk
 
+import logic
+
 FONT = "Arial"
 BACKGROUND_COLOR = "white"
 CALCULATOR_COLOR = "blue"
@@ -9,18 +11,19 @@ CALCULATOR_HEIGHT = 700
 EQUATION_FONT_SIZE = int(CALCULATOR_HEIGHT / 10)
 PADDING = 2
 BUTTONS_LAYOUT = [
-    'x²', '<-', '(', ' )', '/',
-    'tan', '7', '8', '9', '*',
-    'sin', '4', '5', '6', '-',
-    '!',    '1', '2', '3', '+',
-    '√',    '.', '0', 'C', '=',
-        ]
-COLUMNS_NUMBER = 5
-ROWS_NUMBER = len(BUTTONS_LAYOUT) // COLUMNS_NUMBER
+    ['pow', '<-', '(', ')', '/', ','],
+    ['tan', '7', '8', '9', '*'],
+    ['sin', '4', '5', '6', '-'],
+    ['fac', '1', '2', '3', '+'],
+    ['sqrt', '.', '0', 'C', '='],
+]
+BUTTON_HEIGHT = lambda canvas_h: canvas_h / len(BUTTONS_LAYOUT)
+BUTTON_WIDTH = lambda canvas_w: canvas_w / len(BUTTONS_LAYOUT[0])
 
 
 class Calculator:
     def __init__(self, master):
+        self.button_canvas = None
         self.root = master
         self.root.title("Calculator-GUI")
         self.root.geometry(f"{CALCULATOR_WIDTH}x{CALCULATOR_HEIGHT}")
@@ -38,66 +41,47 @@ class Calculator:
         self.entry.pack(side="top", fill="x")
 
         self.root.update()
-        print(self.entry.winfo_height().real)
         canvas_h = CALCULATOR_HEIGHT - self.entry.winfo_height()
 
+        self.create_button_grid(CALCULATOR_WIDTH, canvas_h)
+
+    def create_button_grid(self, w, h):
         self.button_canvas = tk.Canvas(
-            master,
-            width=CALCULATOR_WIDTH,
-            height=canvas_h,
+            self.root,
+            width=w,
+            height=h,
             background=CALCULATOR_COLOR,
             highlightthickness=0,
             borderwidth=0
         )
         self.button_canvas.pack(side="top", fill="both")
 
-        self.create_button_grid(CALCULATOR_WIDTH,canvas_h)
+        for row, buttons_list in enumerate(BUTTONS_LAYOUT):
+            for column, label in enumerate(buttons_list):
+                self.create_button(label, row, column)
 
+    def create_button(self, text, row, column):
+        btn = tk.Button(
+            self.button_canvas,
+            text=text,
+            bg=BUTTON_COLOR,
+            font=(FONT, 14),
+            padx=PADDING,
+            pady=PADDING,
+            command=lambda: self.on_button_click(text)
 
-    def create_button_grid(self,w,h):
-        btn_w = w // COLUMNS_NUMBER
-        btn_h = h //ROWS_NUMBER
-
-        for i, label in enumerate(BUTTONS_LAYOUT):
-            col = i % COLUMNS_NUMBER
-            row = i // COLUMNS_NUMBER
-
-            x_pos = col * btn_w
-            y_pos = row * btn_h
-
-            btn = tk.Button(
-                self.button_canvas,
-                text=label,
-                bg=BUTTON_COLOR,
-                font=(FONT, 14),
-                command=lambda l=label: self.on_button_click(l)
-            )
-
-            self.button_canvas.create_window(
-                x_pos + PADDING,
-                y_pos + PADDING,
-                window=btn,
-                anchor="nw",
-                width=btn_w - (PADDING * 2),
-                height=btn_h - (PADDING * 2)
-            )
-
-    def calculate(self, equation):
-        self.equation.set("")
-        pass
+        )
+        btn.grid(row=row, column=column)
 
     def on_button_click(self, value):
         if value == "C":
             self.equation.set("")
         elif value == "=":
-            self.calculate(self.equation.get())
+            self.equation.set(logic.calculate(self.equation.get()))
         elif value == "<-":
             self.equation.set(self.equation.get()[:-1])
-        elif value == "x²":
-            self.equation.set(self.equation.get() + "²")
         else:
             self.equation.set(self.equation.get() + value)
-
 
 
 if __name__ == '__main__':
