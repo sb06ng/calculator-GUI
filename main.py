@@ -1,3 +1,4 @@
+import time
 import tkinter as tk
 
 import logic
@@ -24,6 +25,10 @@ BUTTON_WIDTH = lambda canvas_w: canvas_w / len(BUTTONS_LAYOUT[0])
 
 
 class Calculator:
+    """
+    create a calculator class that represent the calculator-GUI
+    """
+
     def __init__(self, master):
         self.button_canvas = None
         self.root = master
@@ -48,6 +53,12 @@ class Calculator:
         self.create_button_grid(CALCULATOR_WIDTH, canvas_h)
 
     def create_button_grid(self, w, h):
+        """
+        create the button grid
+        Args:
+            w: width
+            h: height
+        """
         self.button_canvas = tk.Canvas(
             self.root,
             width=w,
@@ -63,6 +74,13 @@ class Calculator:
                 self.create_button(label, row, column)
 
     def create_button(self, text, row, column):
+        """
+        create the button widget
+        Args:
+            text: the text of the button
+            row: which row of the button
+            column: which column of the button
+        """
         btn = tk.Button(
             self.button_canvas,
             text=text,
@@ -76,10 +94,24 @@ class Calculator:
         btn.grid(row=row, column=column)
 
     def on_button_click(self, value):
+        """
+        What to do when the button clicks
+        it sets the equation according to the value passed
+        Args:
+            value: the value of the button
+
+        """
         if value == "C":
             self.equation.set("")
         elif value == "=":
-            self.equation.set(logic.calculate(self.equation.get()))
+            temp = self.equation.get()
+            try:
+                self.equation.set(logic.calculate(temp))
+            except Exception as e:
+                self.equation.set(f"An unexpected error occurred: {e}")
+                self.root.update()
+                time.sleep(3)
+                self.equation.set(temp)
         elif value == "<-":
             self.equation.set(self.equation.get()[:-1])
         else:
